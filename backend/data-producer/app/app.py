@@ -1,15 +1,22 @@
 from fastapi import FastAPI
-from kafka import KafkaProducer
 import time
+from app.lib.brokers.producer import kafka_send
+from random import randint
+
 
 app = FastAPI()
 
-producer = KafkaProducer(bootstrap_servers=['kafka:9092'])
-
 @app.on_event("startup")
 async def startup_event():
+    print("Starting up...")
+    hello_world = {'message': 'Hello World!'}
+    sent = kafka_send('messages', hello_world)
+    while not sent:
+        sent = kafka_send('messages', hello_world)
+        time.sleep(1)
+    print("System is ready")
+
     while True:
-        # Produce data every 10 seconds (adjust the sleep time as needed)
-        data = {"message": "Hello from producer!"}
-        producer.send("messages", value=data)
-        time.sleep(5)
+        data = {'value': randint(0, 100)}
+        sent = kafka_send('messages', data)
+        time.sleep(1)
