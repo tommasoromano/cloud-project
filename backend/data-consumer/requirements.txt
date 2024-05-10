@@ -1,9 +1,0 @@
-fastapi
-requests
-beautifulsoup4
-uvicorn
-pandas
-kafka-python
-asyncio
-aiokafka
-confluent-kafka
