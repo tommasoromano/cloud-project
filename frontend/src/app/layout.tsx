@@ -4,6 +4,8 @@ import "./globals.css";
 
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Header } from "@/components/blocks/header";
+import { UserProvider } from "@auth0/nextjs-auth0/client";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -28,14 +30,17 @@ export default function RootLayout({
         enableSystem
         disableTransitionOnChange
       >
-        <body
-          className={cn(
-            "min-h-screen w-full bg-secondary font-sans antialiased flex flex-col items-center justify-start",
-            fontSans.variable
-          )}
-        >
-          <div className="w-full max-w-screen-sm p-6">{children}</div>
-        </body>
+        <UserProvider>
+          <body
+            className={cn(
+              "min-h-screen w-full bg-secondary font-sans antialiased flex flex-col items-center justify-start",
+              fontSans.variable
+            )}
+          >
+            <Header />
+            <div className="mt-14 w-full max-w-screen-sm p-6">{children}</div>
+          </body>
+        </UserProvider>
       </ThemeProvider>
     </html>
   );
