@@ -1,20 +1,26 @@
 import { Transaction, calculateBalance } from "@/types/types";
 import { Button } from "../ui/button";
 import Link from "next/link";
+import useAuthUser from "@/app/hooks/use-auth-user";
 
 export const HeroBalance = ({
   transactions,
-  user,
 }: {
   transactions: Transaction[];
-  user: string;
 }) => {
+  const [user, isLoading] = useAuthUser();
+
+  if (!user) {
+    return null;
+  }
+
   return (
     <div className="rounded-lg bg-primary p-6 shadow-sm w-full">
       <div className="flex items-center justify-between text-primary-foreground">
         <div>
           <h2 className="text-lg font-medium">
-            Hello <span className="font-black">{user}</span> ☀️
+            Hello{" "}
+            <span className="font-black">{user?.email?.split("@")[0]}</span> ☀️
           </h2>
           {/* <p className="text-3xl font-bold">$2,546.78</p> */}
           <p className="text-3xl font-bold">

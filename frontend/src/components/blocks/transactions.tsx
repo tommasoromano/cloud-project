@@ -35,7 +35,7 @@ const transactionLine = (t: Transaction, i: number) => {
             {t.amount >= 0 ? "Received from" : "Sent to"}{" "}
             <span className="font-bold">{t.recipient}</span>
           </p>
-          <p className="text-sm text-muted-foreground">
+          <div className="text-sm text-muted-foreground">
             {t.status === "success" ? null : t.status === "failed" ||
               t.status === "cancelled" ? (
               <Badge variant="destructive" className="text-xs">
@@ -45,7 +45,7 @@ const transactionLine = (t: Transaction, i: number) => {
               <Badge className="text-xs">Pending</Badge>
             )}{" "}
             {t.note}
-          </p>
+          </div>
         </div>
       </div>
       <div className="flex items-center gap-2">

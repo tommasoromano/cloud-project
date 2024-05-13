@@ -6,14 +6,10 @@ import { useUser } from "@auth0/nextjs-auth0/client";
 import { useRouter } from "next/navigation";
 import { CircleX, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import useAuthUser from "./hooks/use-auth-user";
 
 export default function Home() {
-  const { user, error, isLoading } = useUser();
-  const router = useRouter();
-  // if (error) {
-  //   router.push("/api/auth/login");
-  //   return <div>{error.message}</div>;
-  // }
+  const [user, isLoading] = useAuthUser();
 
   const transactions = [
     makeRandomTransaction(),
@@ -38,12 +34,7 @@ export default function Home() {
       {!isLoading && !user && (
         <h2 className="text-lg font-medium">You are not logged in</h2>
       )}
-      {!isLoading && !user && (
-        <Button onClick={() => router.push("/api/auth/login")}>Login</Button>
-      )}
-      {!isLoading && user && (
-        <HeroBalance transactions={transactions} user="Tommaso" />
-      )}
+      {!isLoading && user && <HeroBalance transactions={transactions} />}
       {!isLoading && user && <Transactions data={transactions} />}
       {/* {sectionActions} */}
     </div>

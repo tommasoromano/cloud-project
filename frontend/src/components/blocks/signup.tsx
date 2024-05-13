@@ -1,3 +1,4 @@
+"use client";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
@@ -10,8 +11,12 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { handleSignUp } from "@/lib/cognitoActions";
+import { useFormState } from "react-dom";
 
-export const SignupForm = ({ onClickLogin }: { onClickLogin: () => void }) => {
+export const SignupForm = ({}: {}) => {
+  const [errorMessage, dispatch] = useFormState(handleSignUp, undefined);
+
   return (
     <Card className="mx-auto max-w-sm">
       <CardHeader>
@@ -21,29 +26,36 @@ export const SignupForm = ({ onClickLogin }: { onClickLogin: () => void }) => {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="grid gap-4">
-          <div className="grid grid-cols-2 gap-4">
+        <form
+          action={(fd) => {
+            console.log(fd);
+            dispatch(fd);
+          }}
+          className="grid gap-4"
+        >
+          {/* <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="first-name">First name</Label>
-              <Input id="first-name" placeholder="Max" required />
+              <Label htmlFor="name">First name</Label>
+              <Input id="name" placeholder="Max" required />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="last-name">Last name</Label>
-              <Input id="last-name" placeholder="Robinson" required />
+              <Label htmlFor="family_name">Last name</Label>
+              <Input id="family_name" placeholder="Robinson" required />
             </div>
-          </div>
+          </div> */}
           <div className="grid gap-2">
             <Label htmlFor="email">Email</Label>
             <Input
               id="email"
               type="email"
+              name="email"
               placeholder="email@example.com"
               required
             />
           </div>
           <div className="grid gap-2">
             <Label htmlFor="password">Password</Label>
-            <Input id="password" type="password" />
+            <Input id="password" type="password" name="password" required />
           </div>
           <Button type="submit" className="w-full">
             Create an account
@@ -51,12 +63,15 @@ export const SignupForm = ({ onClickLogin }: { onClickLogin: () => void }) => {
           {/* <Button variant="outline" className="w-full">
             Sign up with GitHub
           </Button> */}
-        </div>
+        </form>
         <div className="mt-4 text-center text-sm">
           Already have an account?{" "}
-          <Link href="#" className="underline" onClick={onClickLogin}>
+          <Link href="/auth/login" className="underline">
             Login
           </Link>
+        </div>
+        <div className="mt-4 text-center text-sm">
+          {errorMessage && <p className="text-red-500">{errorMessage}</p>}
         </div>
       </CardContent>
     </Card>

@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Header } from "@/components/blocks/header";
 import { UserProvider } from "@auth0/nextjs-auth0/client";
+import ConfigureAmplifyClientSide from "./amplify-cognito-config";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -24,24 +25,25 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <ThemeProvider
-        attribute="class"
-        defaultTheme="light"
-        enableSystem
-        disableTransitionOnChange
+      <body
+        className={cn(
+          "min-h-screen w-full font-sans antialiased",
+          fontSans.variable
+        )}
       >
-        <UserProvider>
-          <body
-            className={cn(
-              "min-h-screen w-full bg-secondary font-sans antialiased flex flex-col items-center justify-start",
-              fontSans.variable
-            )}
-          >
-            <Header />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="light"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <ConfigureAmplifyClientSide />
+          <Header />
+          <div className="bg-secondary w-full h-full min-h-screen flex flex-col items-center justify-start">
             <div className="mt-14 w-full max-w-screen-sm p-6">{children}</div>
-          </body>
-        </UserProvider>
-      </ThemeProvider>
+          </div>
+        </ThemeProvider>
+      </body>
     </html>
   );
 }

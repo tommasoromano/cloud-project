@@ -1,3 +1,4 @@
+"use client";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
@@ -10,8 +11,11 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { handleSignIn } from "@/lib/cognitoActions";
+import { useFormState } from "react-dom";
 
-export const LoginForm = ({ onClickSignup }: { onClickSignup: () => void }) => {
+export const LoginForm = ({}: {}) => {
+  const [errorMessage, dispatch] = useFormState(handleSignIn, undefined);
   return (
     <Card className="mx-auto max-w-sm">
       <CardHeader>
@@ -21,12 +25,13 @@ export const LoginForm = ({ onClickSignup }: { onClickSignup: () => void }) => {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="grid gap-4">
+        <form action={dispatch} className="grid gap-4">
           <div className="grid gap-2">
             <Label htmlFor="email">Email</Label>
             <Input
               id="email"
               type="email"
+              name="email"
               placeholder="email@example.com"
               required
             />
@@ -38,7 +43,7 @@ export const LoginForm = ({ onClickSignup }: { onClickSignup: () => void }) => {
                 Forgot your password?
               </Link>
             </div>
-            <Input id="password" type="password" required />
+            <Input id="password" type="password" name="password" required />
           </div>
           <Button type="submit" className="w-full">
             Login
@@ -46,12 +51,15 @@ export const LoginForm = ({ onClickSignup }: { onClickSignup: () => void }) => {
           {/* <Button variant="outline" className="w-full">
             Login with Google
           </Button> */}
-        </div>
+        </form>
         <div className="mt-4 text-center text-sm">
           Don&apos;t have an account?{" "}
-          <Link href="#" className="underline" onClick={onClickSignup}>
+          <Link href="/auth/signup" className="underline">
             Sign up
           </Link>
+        </div>
+        <div className="mt-4 text-center text-sm">
+          {errorMessage && <p className="text-red-500">{errorMessage}</p>}
         </div>
       </CardContent>
     </Card>

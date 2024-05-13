@@ -23,26 +23,20 @@ import {
   AlertDialogTrigger,
 } from "../ui/alert-dialog";
 import { LoginForm } from "./login";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SignupForm } from "./signup";
-import { useUser } from "@auth0/nextjs-auth0/client";
 import { useRouter } from "next/navigation";
+import useAuthUser from "@/app/hooks/use-auth-user";
+import { handleSignOut } from "@/lib/cognitoActions";
 
 export const Header = ({}: {}) => {
-  const { user, error, isLoading } = useUser();
-
   const router = useRouter();
+  const [_user, isLoading] = useAuthUser();
+  const [user, setUser] = useState(_user);
+  useEffect(() => {
+    setUser(_user);
+  }, [_user, isLoading]);
 
-  //   if (error) {
-  //     router.push("/api/auth/login");
-  //     return <div>{error.message}</div>;
-  //   }
-  //   if (!isLoading && !user) {
-  //     router.push("/api/auth/login");
-  //     return <div></div>;
-  //   }
-
-  //   const notHasUser = <Button variant="secondary">Login</Button>;
   const hasUser = user && (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -51,8 +45,8 @@ export const Header = ({}: {}) => {
             <AvatarImage src="" />
             {/* <AvatarImage src="https://github.com/shadcn.png" /> */}
             <AvatarFallback>
-              {user.name?.split(" ")[0][0]}
-              {user.name?.split(" ")[1][0]}
+              {user.email?.[0]}
+              {user.email?.[1]}
             </AvatarFallback>
           </Avatar>
         </Button>
@@ -60,12 +54,11 @@ export const Header = ({}: {}) => {
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        {<DropdownMenuItem>{user.name}</DropdownMenuItem>}
+        {<DropdownMenuItem>{user.userId}</DropdownMenuItem>}
+        {/* {<DropdownMenuItem>{user.username}</DropdownMenuItem>} */}
         {<DropdownMenuItem>{user.email}</DropdownMenuItem>}
-        {<DropdownMenuItem>{user.nickname}</DropdownMenuItem>}
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => router.push("/api/auth/logout")}>
-          {/* <Link href="/api/auth/logout">Logout</Link> */}
+        <DropdownMenuItem onClick={() => handleSignOut()}>
           Logout
         </DropdownMenuItem>
       </DropdownMenuContent>
@@ -89,7 +82,7 @@ export const Header = ({}: {}) => {
             hasUser
           ) : (
             <Button
-              onClick={() => router.push("/api/auth/login")}
+              onClick={() => router.push("/auth/login")}
               variant={"secondary"}
             >
               Login
@@ -109,19 +102,7 @@ const LoginBlocker = ({}: {}) => {
     <AlertDialog open>
       {/* <AlertDialogTrigger>Open</AlertDialogTrigger> */}
       <AlertDialogContent className="bg-transparent border-transparent">
-        {kind === "login" ? (
-          <LoginForm
-            onClickSignup={() => {
-              setKind("signup");
-            }}
-          />
-        ) : (
-          <SignupForm
-            onClickLogin={() => {
-              setKind("login");
-            }}
-          />
-        )}
+        {kind === "login" ? <LoginForm /> : <SignupForm />}
       </AlertDialogContent>
     </AlertDialog>
   );
