@@ -8,6 +8,7 @@ export interface Transaction {
   amount: number;
   status: TransactionStatus;
   note: string;
+  statusMessage: string;
 }
 
 export const calculateBalance = (transactions: Transaction[]) =>
@@ -44,5 +45,6 @@ export const makeRandomTransaction = () => {
     amount,
     status,
     note,
+    statusMessage: "",
   } as Transaction;
 };
