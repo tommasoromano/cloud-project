@@ -72,27 +72,6 @@ const transactionLine = (t: Transaction, i: number) => {
 };
 
 export const Transactions = ({ data }: { data: Transaction[] }) => {
-  // const [products, setProducts] = useState<Transaction[]>([]);
-  // const [loading, setLoading] = useState(false);
-  // useEffect(() => {
-  //   setLoading(true);
-  //   fetch(
-  //     "https://2jkazays2f.execute-api.eu-central-1.amazonaws.com/default/GetAllProducts",
-  //     { cache: "reload" }
-  //   )
-  //     .then((res) => res.json())
-  //     .then((data) => {
-  //       if (data.error) {
-  //         return;
-  //       }
-  //       setProducts(data);
-  //       setLoading(false);
-  //     })
-  //     .catch((err) => {
-  //       setLoading(false);
-  //       console.log(err);
-  //     });
-  // }, []);
 
   return (
     <div className="rounded-lg bg-background p-6 shadow-sm w-full">
