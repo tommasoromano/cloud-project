@@ -4,8 +4,8 @@ import { Transaction, makeRandomTransaction } from "@/types/types";
 import { HeroBalance } from "@/components/blocks/balance";
 import { CircleX, Loader2 } from "lucide-react";
 import useAuthUser from "./hooks/use-auth-user";
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { get, isCancelError } from '@aws-amplify/api';
+import { useState, useEffect } from "react";
 
 export default function Home() {
   const [user, isLoading] = useAuthUser();
@@ -22,37 +22,52 @@ export default function Home() {
   //   makeRandomTransaction(),
   //   makeRandomTransaction(),
   // ];
+  
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(false);
+  const [data, setData] = useState(null);
+
   useEffect(() => {
     setLoading(true);
-    fetch(
-      "https://z07r0dozg2.execute-api.eu-central-1.amazonaws.com/cloudprojectstage",
-      { 
-        method: "GET",
-        headers: {
-          "Access-Control-Allow-Headers": "Content-Type",
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Methods": "GET"
-  }})
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.error) {
-          return;
-        }
-        setTransactions(data);
+    const fetchData = async () => {
+      const { body } = await get({
+        apiName: "cloud-project-api-rest",
+        path: "/transaction",
+        // options: {
+        //   headers, // Optional, A map of custom header key/values
+        //   body, // Optional, JSON object or FormData
+        //   queryParams, // Optional, A map of query strings
+        // }
+      }).response;
+      return await body.json();
+    }
+    fetchData().then((res) => {
+      // setTransactions(data);
+      console.log(res);
+      setData(res as any);
+      setLoading(false);
+    }).catch((error) => {
+      if (!isCancelError(error)) {
+        console.error(error);
         setLoading(false);
-      })
-      .catch((err) => {
-        setLoading(false);
-        console.log(err);
-      });
+      }
+    }
+    );
+    
+    // fetch(
+    //   "https://z07r0dozg2.execute-api.eu-central-1.amazonaws.com/cloudprojectstage/transaction",
+    // ).then((response) => 
+    //   {
+    //     console.log(response);
+    //     return response.json()})
+    
   }, []);
 
-  console.log(transactions)
+  console.log(transactions);
 
   return (
     <div className="flex flex-col gap-6 items-center justify-center">
+    {JSON.stringify(data)}
       {isLoading && <Loader2 className="w-16 h-16 animate-spin" />}
       {isLoading && (
         <h2 className="text-lg font-medium">Loading your wallet...</h2>

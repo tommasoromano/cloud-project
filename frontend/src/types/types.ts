@@ -12,6 +12,7 @@ export interface Transaction {
 }
 
 export const calculateBalance = (transactions: Transaction[]) =>
+  transactions.length === 0 ? 0 :
   transactions
     .map((t) => (t.status === "success" ? t.amount : 0))
     .reduce((p, c) => p + c);

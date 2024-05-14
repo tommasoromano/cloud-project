@@ -12,6 +12,13 @@ export const authConfig: ResourcesConfig["Auth"] = {
 Amplify.configure(
   {
     Auth: authConfig,
+    API: {
+      REST: {
+        "cloud-project-api-rest": {
+          endpoint: "https://z07r0dozg2.execute-api.eu-central-1.amazonaws.com/cloudprojectstage"
+        }
+      }
+    }
   },
   { ssr: true }
 );
