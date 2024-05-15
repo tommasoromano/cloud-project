@@ -28,6 +28,7 @@ import { SignupForm } from "./signup";
 import { useRouter } from "next/navigation";
 import useAuthUser from "@/app/hooks/use-auth-user";
 import { handleSignOut } from "@/lib/cognitoActions";
+import { userToName } from "@/types/types";
 
 export const Header = ({}: {}) => {
   const router = useRouter();
@@ -45,8 +46,8 @@ export const Header = ({}: {}) => {
             <AvatarImage src="" />
             {/* <AvatarImage src="https://github.com/shadcn.png" /> */}
             <AvatarFallback>
-              {user.email?.[0]}
-              {user.email?.[1]}
+              {userToName(user.userId)[0].toUpperCase()}
+              {userToName(user.userId)[1].toUpperCase()}
             </AvatarFallback>
           </Avatar>
         </Button>

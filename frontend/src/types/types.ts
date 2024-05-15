@@ -11,11 +11,19 @@ export interface Transaction {
   statusMessage: string;
 }
 
-export const calculateBalance = (transactions: Transaction[]) =>
-  transactions.length === 0 ? 0 :
-  transactions
-    .map((t) => (t.status === "success" ? t.amount : 0))
-    .reduce((p, c) => p + c);
+export const calculateBalance = (transactions: Transaction[], userId: string) =>
+  transactions.length === 0
+    ? 0
+    : transactions
+        .filter((t) => t.recipient === userId || t.sender === userId)
+        .map((t) =>
+          t.status === "success"
+            ? t.recipient !== userId && t.sender === userId
+              ? -t.amount
+              : t.amount
+            : 0
+        )
+        .reduce((p, c) => p + c);
 
 export const makeRandomTransaction = () => {
   const id = Math.random().toString(36).substring(2, 10);
@@ -48,4 +56,15 @@ export const makeRandomTransaction = () => {
     note,
     statusMessage: "",
   } as Transaction;
+};
+
+export const userToName = (userId: string) => {
+  const users: { [key: string]: string } = {
+    "83b43852-80d1-7042-d716-e36dfe409b14": "Alice",
+    "9374f852-40b1-705e-abd1-707970ccb270": "Bob",
+  };
+  if (Object.keys(users).includes(userId)) {
+    return users[userId];
+  }
+  return "Charlie";
 };

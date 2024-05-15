@@ -1,6 +1,6 @@
 import { ArrowDownIcon, ArrowUpIcon } from "lucide-react";
 import { Badge } from "../ui/badge";
-import { Transaction, makeRandomTransaction } from "@/types/types";
+import { Transaction, makeRandomTransaction, userToName } from "@/types/types";
 import { useEffect, useState } from "react";
 
 const monthNames = [
@@ -34,7 +34,7 @@ const transactionLine = (t: Transaction, i: number) => {
         <div className="flex flex-col">
           <p className="text-sm font-medium">
             {t.amount >= 0 ? "Received from" : "Sent to"}{" "}
-            <span className="font-bold">{t.recipient}</span>
+            <span className="font-bold">{userToName(t.recipient)}</span>
           </p>
           <div className="text-sm text-muted-foreground">
             {t.status === "success" ? null : t.status === "failed" ||

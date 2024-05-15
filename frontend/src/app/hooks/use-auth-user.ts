@@ -7,7 +7,7 @@ import {
 } from "aws-amplify/auth";
 import { useEffect, useState } from "react";
 
-type User =
+export type User =
   | (AuthUser & FetchUserAttributesOutput & { isAdmin: boolean })
   | undefined;
 

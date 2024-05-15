@@ -31,9 +31,11 @@ export const handler = async (event, context, callback) => {
         statusCode: 404,
         body: JSON.stringify("no_items_found"),
         headers: {
-          "Access-Control-Allow-Headers": "Content-Type",
+          // "Access-Control-Allow-Headers": "Content-Type",
           "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Methods": "GET",
+          // "Access-Control-Allow-Methods": "GET",
+          "Access-Control-Allow-Credentials" : "true",
+          // "Content-Type": "application/json"
         },
       };
     }
@@ -51,9 +53,11 @@ export const handler = async (event, context, callback) => {
       error: false,
       body: JSON.stringify(items),
       headers: {
-        "Access-Control-Allow-Headers": "Content-Type",
+        // "Access-Control-Allow-Headers": "Content-Type",
         "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET",
+        // "Access-Control-Allow-Methods": "GET",
+        "Access-Control-Allow-Credentials" : "true",
+        // "Content-Type": "application/json"
       },
     };
   } catch (error) {
@@ -62,9 +66,11 @@ export const handler = async (event, context, callback) => {
       error: true,
       body: JSON.stringify("no_items_found"),
       headers: {
-        "Access-Control-Allow-Headers": "Content-Type",
+        // "Access-Control-Allow-Headers": "Content-Type",
         "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET",
+        // "Access-Control-Allow-Methods": "GET",
+        "Access-Control-Allow-Credentials" : "true",
+        // "Content-Type": "application/json"
       },
     };
   }

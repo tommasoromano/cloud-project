@@ -1,4 +1,4 @@
-import { Transaction, calculateBalance } from "@/types/types";
+import { Transaction, calculateBalance, userToName } from "@/types/types";
 import { Button } from "../ui/button";
 import Link from "next/link";
 import useAuthUser from "@/app/hooks/use-auth-user";
@@ -20,11 +20,12 @@ export const HeroBalance = ({
         <div>
           <h2 className="text-lg font-medium">
             Hello{" "}
-            <span className="font-black">{user?.email?.split("@")[0]}</span> ☀️
+            {/* <span className="font-black">{user?.email?.split("@")[0]}</span> ☀️ */}
+            <span className="font-black">{userToName(user.userId)}</span> ☀️
           </h2>
           {/* <p className="text-3xl font-bold">$2,546.78</p> */}
           <p className="text-3xl font-bold">
-            {calculateBalance(transactions).toFixed(2)}€
+            {calculateBalance(transactions, user.userId).toFixed(2)}€
           </p>
         </div>
         <div className="flex flex-row items-center justify-center gap-2">
