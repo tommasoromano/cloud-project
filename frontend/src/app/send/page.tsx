@@ -15,25 +15,40 @@ import { useFormState } from "react-dom";
 import { post, isCancelError } from "@aws-amplify/api";
 import useTransactions from "../hooks/use-transactions";
 import useAuthUser from "../hooks/use-auth-user";
+import { useRouter } from "next/navigation";
+import axios from "axios";
 
 export default function SendMoney() {
-  const [id, setId] = useState<string>("");
-  // const [status, setStatus] = useState<TransactionStatus | "none">("none");
-  const [transaction, setTransaction] = useState<Transaction | undefined>();
   const [user, isLoadingAuth] = useAuthUser();
   const { postTransaction } = useTransactions(user);
+  const router = useRouter();
+
+  const [sent, setSent] = useState(false);
+  const [data, setData] = useState<string[] | undefined>(undefined);
 
   async function handleSend(prevState: string | undefined, formData: FormData) {
     try {
-      postTransaction(
+      const _data = [
         formData.get("recipient") as string,
-        parseFloat(formData.get("amount") as string),
-        formData.get("note") as string
+        formData.get("amount") as string,
+        formData.get("note") as string,
+      ];
+      // await postTransaction(_data[0], parseFloat(_data[1]), _data[2]);
+      setData(_data);
+      await axios.post(
+        "https://z07r0dozg2.execute-api.eu-central-1.amazonaws.com/cloudprojectstage/transaction",
+        {
+          sender: user?.userId,
+          recipient: _data[0],
+          amount: parseFloat(_data[1]),
+          note: _data[2],
+        }
       );
+      setSent(true);
     } catch (error) {
       if (!isCancelError(error)) {
         console.error(error);
-        return "There was an error sending the transaction";
+        return "";
       }
     }
   }
@@ -75,24 +90,97 @@ export default function SendMoney() {
     </div>
   );
 
-  const processing = transaction && (
-    <div className="rounded-lg bg-background p-6 shadow-sm flex flex-col items-center justify-center gap-4">
-      <Loader2 className="h-16 w-16 animate-spin" />
-      <h2 className="text-lg font-medium">Processing...</h2>
-      <p className="">
-        Sending {transaction.amount.toFixed(2)}€ to {transaction.recipient}
-        {transaction.note ? ` for: ${transaction.note}` : ""}
-      </p>
-    </div>
-  );
+  // const processing = transaction && (
+  //   <div className="rounded-lg bg-background p-6 shadow-sm flex flex-col items-center justify-center gap-4">
+  //     <Loader2 className="h-16 w-16 animate-spin" />
+  //     <h2 className="text-lg font-medium">Processing...</h2>
+  //     <p className="">
+  //       Sending {transaction.amount.toFixed(2)}€ to {transaction.recipient}
+  //       {transaction.note ? ` for: ${transaction.note}` : ""}
+  //     </p>
+  //   </div>
+  // );
 
-  const success = transaction && (
+  // const success = transaction && (
+  //   <div className="rounded-lg bg-background p-6 shadow-sm flex flex-col items-center justify-center gap-4">
+  //     <CircleCheck className="h-16 w-16 text-green-500" />
+  //     <h2 className="text-lg font-medium">Success!</h2>
+  //     <p className="">
+  //       You sent {transaction.amount.toFixed(2)}€ to {transaction.recipient}
+  //       {transaction.note ? ` for: ${transaction.note}` : ""}
+  //     </p>
+  //     <div className="flex gap-2">
+  //       <Link href="/">
+  //         <Button
+  //           className="w-full"
+  //           onClick={() => {
+  //             //   setStatus("none");
+  //           }}
+  //         >
+  //           Back to Home
+  //         </Button>
+  //       </Link>
+  //       <Link href="/send">
+  //         <Button
+  //           className="w-full"
+  //           onClick={() => {
+  //             //   setStatus("none");
+  //           }}
+  //         >
+  //           Send More Money
+  //         </Button>
+  //       </Link>
+  //     </div>
+  //   </div>
+  // );
+
+  // const error = transaction && (
+  //   <div className="rounded-lg bg-background p-6 shadow-sm flex flex-col items-center justify-center gap-4">
+  //     <CircleX className="h-16 w-16 text-red-500" />
+  //     <h2 className="text-lg font-medium">Error</h2>
+  //     <p className="">
+  //       There was an error sending {transaction.amount.toFixed(2)}€ to{" "}
+  //       {transaction.recipient}: {transaction.statusMessage}
+  //     </p>
+  //     <div className="flex gap-2">
+  //       <Button
+  //         className="w-full"
+  //         onClick={() => {
+  //           // setStatus("none");
+  //         }}
+  //       >
+  //         Try Again
+  //       </Button>
+  //       <Link href="/">
+  //         <Button
+  //           className="w-full"
+  //           onClick={() => {
+  //             //   setStatus("none");
+  //           }}
+  //         >
+  //           Back to Home
+  //         </Button>
+  //       </Link>
+  //       <Link href="/send">
+  //         <Button
+  //           className="w-full"
+  //           onClick={() => {
+  //             // setStatus("none");
+  //           }}
+  //         >
+  //           Send More Money
+  //         </Button>
+  //       </Link>
+  //     </div>
+  //   </div>
+  // );
+
+  const success = data && (
     <div className="rounded-lg bg-background p-6 shadow-sm flex flex-col items-center justify-center gap-4">
       <CircleCheck className="h-16 w-16 text-green-500" />
-      <h2 className="text-lg font-medium">Success!</h2>
+      <h2 className="text-lg font-medium">Sent correctly!</h2>
       <p className="">
-        You sent {transaction.amount.toFixed(2)}€ to {transaction.recipient}
-        {transaction.note ? ` for: ${transaction.note}` : ""}
+        You sent {parseFloat(data[1]).toFixed(2)}€ to {data[0]} for: {data[2]}
       </p>
       <div className="flex gap-2">
         <Link href="/">
@@ -109,48 +197,8 @@ export default function SendMoney() {
           <Button
             className="w-full"
             onClick={() => {
-              //   setStatus("none");
-            }}
-          >
-            Send More Money
-          </Button>
-        </Link>
-      </div>
-    </div>
-  );
-
-  const error = transaction && (
-    <div className="rounded-lg bg-background p-6 shadow-sm flex flex-col items-center justify-center gap-4">
-      <CircleX className="h-16 w-16 text-red-500" />
-      <h2 className="text-lg font-medium">Error</h2>
-      <p className="">
-        There was an error sending {transaction.amount.toFixed(2)}€ to{" "}
-        {transaction.recipient}: {transaction.statusMessage}
-      </p>
-      <div className="flex gap-2">
-        <Button
-          className="w-full"
-          onClick={() => {
-            // setStatus("none");
-          }}
-        >
-          Try Again
-        </Button>
-        <Link href="/">
-          <Button
-            className="w-full"
-            onClick={() => {
-              //   setStatus("none");
-            }}
-          >
-            Back to Home
-          </Button>
-        </Link>
-        <Link href="/send">
-          <Button
-            className="w-full"
-            onClick={() => {
-              // setStatus("none");
+              setSent(false);
+              setData(undefined);
             }}
           >
             Send More Money
@@ -162,7 +210,8 @@ export default function SendMoney() {
 
   return (
     <div className="flex flex-col gap-6">
-      {id === ""
+      {sent ? success : form}
+      {/* {id === ""
         ? form
         : transaction && transaction.status === "pending"
         ? processing
@@ -170,7 +219,7 @@ export default function SendMoney() {
         ? success
         : transaction && transaction.status === "failed"
         ? error
-        : null}
+        : null} */}
     </div>
   );
 }

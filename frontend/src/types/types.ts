@@ -68,3 +68,14 @@ export const userToName = (userId: string) => {
   }
   return "Charlie";
 };
+
+export const nameToUser = (name: string) => {
+  const users: { [key: string]: string } = {
+    Alice: "83b43852-80d1-7042-d716-e36dfe409b14",
+    Bob: "9374f852-40b1-705e-abd1-707970ccb270",
+  };
+  if (Object.keys(users).includes(name)) {
+    return users[name];
+  }
+  return "Charlie";
+};
