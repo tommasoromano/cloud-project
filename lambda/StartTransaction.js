@@ -6,45 +6,23 @@ import { DynamoDBClient, PutItemCommand } from "@aws-sdk/client-dynamodb"; // ES
 const dynamoDBClient = new DynamoDBClient();
 
 export const handler = async (event) => {
-  let response;
-  const headers = {
-    "Access-Control-Allow-Headers": "Content-Type",
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "POST",
-  };
-
   // check if body is empty
   if (!event.body) {
-    response = {
-      statusCode: 400,
-      body: JSON.stringify({ message: "missing_information" }),
-      headers: headers,
-    };
-    return response;
+    return returnErrorParams("Missing body");
   }
 
   // check if body is valid JSON
   try {
     JSON.parse(event.body);
   } catch (error) {
-    response = {
-      statusCode: 400,
-      body: JSON.stringify({ message: "invalid_json" }),
-      headers: headers,
-    };
-    return response;
+    return returnErrorParams("Invalid json");
   }
 
   // check if body contains all required parameters
   const eventParams = ["sender", "recipient", "amount", "note"];
   for (let i = 0; i < eventParams.length; i++) {
     if (!JSON.parse(event.body)[eventParams[i]]) {
-      response = {
-        statusCode: 400,
-        body: JSON.stringify({ message: "missing_" + eventParams[i] }),
-        headers: headers,
-      };
-      return response;
+      return returnErrorParams("Missing " + eventParams[i]);
     }
   }
 
@@ -56,7 +34,7 @@ export const handler = async (event) => {
     Math.random().toString(36).substring(2, 10) +
     Math.random().toString(36).substring(2, 10);
   const timestamp = Date.now();
-  const status = "pending";
+  const transactionStatus = "pending";
   const statusMessage = "Transaction is pending";
 
   const paramsDynamo = {
@@ -68,7 +46,7 @@ export const handler = async (event) => {
       amount: { N: parseFloat(amount).toString() },
       note: { S: note },
       timestamp: { N: timestamp.toString() },
-      status: { S: status },
+      transactionStatus: { S: transactionStatus },
       statusMessage: { S: statusMessage },
     },
   };
@@ -77,41 +55,18 @@ export const handler = async (event) => {
 
   try {
     const res = await dynamoDBClient.send(command);
-    console.log(res);
   } catch (error) {
-    console.log(error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify("Error adding record"),
-      headers: headers,
-    };
+    return returnError("Error adding record to DynamoDB");
   }
 
-  response = {
-    statusCode: 200,
-    error: false,
-    body: JSON.stringify({
-      id,
-      sender,
-      recipient,
-      amount,
-      note,
-      timestamp,
-      status,
-      statusMessage,
-    }),
-    headers: headers,
-  };
-
-  let dataSQS;
-  dataSQS = {
+  const dataSQS = {
     id: id,
     sender: sender,
     recipient: recipient,
     amount: amount,
     note: note,
     timestamp: timestamp,
-    status: status,
+    transactionStatus: transactionStatus,
     statusMessage: statusMessage,
   };
 
@@ -135,29 +90,42 @@ export const handler = async (event) => {
   // Send to SQS
   try {
     const data = await sqsClient.send(new SendMessageCommand(params));
-    console.log(data);
     if (data) {
-      const bodyMessage = {
-        message: "Message Sent to SQS - MessageId: " + data.MessageId,
-        transaction: response.body,
-      };
       return {
-        ...response,
-        body: JSON.stringify(bodyMessage),
-      };
-    } else {
-      return {
-        statusCode: 500,
-        body: JSON.stringify({ message: "error_sending_message_to_SQS" }),
+        statusCode: 200,
+        error: false,
+        body: JSON.stringify({
+          message: "Message Sent to SQS - MessageId: " + data.MessageId,
+          transaction: dataSQS,
+        }),
         headers: headers,
       };
+    } else {
+      return returnError("Error sending message to SQS");
     }
   } catch (err) {
-    console.log(err);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ message: "error: " + JSON.stringify(err) }),
-      headers: headers,
-    };
+    return returnError("Error sending message to SQS");
   }
+};
+
+const headers = {
+  "Access-Control-Allow-Headers": "Content-Type",
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "POST",
+};
+
+const returnErrorParams = (message) => {
+  return {
+    statusCode: 400,
+    body: JSON.stringify({ message: message }),
+    headers: headers,
+  };
+};
+
+const returnError = (message) => {
+  return {
+    statusCode: 500,
+    body: JSON.stringify({ message: message }),
+    headers: headers,
+  };
 };

@@ -6,7 +6,7 @@ export interface Transaction {
   recipient: string;
   timestamp: number;
   amount: number;
-  status: TransactionStatus;
+  transactionStatus: TransactionStatus;
   note: string;
   statusMessage: string;
 }
@@ -17,7 +17,7 @@ export const calculateBalance = (transactions: Transaction[], userId: string) =>
     : transactions
         .filter((t) => t.recipient === userId || t.sender === userId)
         .map((t) =>
-          t.status === "success"
+          t.transactionStatus === "success"
             ? t.recipient !== userId && t.sender === userId
               ? -t.amount
               : t.amount
@@ -52,7 +52,7 @@ export const makeRandomTransaction = () => {
     recipient: user,
     timestamp: date,
     amount,
-    status,
+    transactionStatus: status,
     note,
     statusMessage: "",
   } as Transaction;

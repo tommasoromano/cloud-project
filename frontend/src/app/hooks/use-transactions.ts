@@ -27,7 +27,7 @@ export default function useTransactions(user: User) {
               recipient: t.recipient,
               timestamp: t.timestamp,
               amount: t.amount,
-              status: t.status,
+              transactionStatus: t.transactionStatus,
               note: t.note,
               statusMessage: t.statusMessage,
             } as Transaction)

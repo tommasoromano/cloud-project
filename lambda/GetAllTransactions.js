@@ -30,11 +30,7 @@ export const handler = async (event, context, callback) => {
       return {
         statusCode: 404,
         body: JSON.stringify("no_items_found"),
-        headers: {
-          "Access-Control-Allow-Headers": "Content-Type",
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Methods": "GET",
-        },
+        headers: headers,
       };
     }
 
@@ -50,22 +46,20 @@ export const handler = async (event, context, callback) => {
       statusCode: 200,
       error: false,
       body: JSON.stringify(items),
-      headers: {
-        "Access-Control-Allow-Headers": "Content-Type",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET",
-      },
+      headers: headers,
     };
   } catch (error) {
     return {
       statusCode: 500,
       error: true,
       body: JSON.stringify("no_items_found"),
-      headers: {
-        "Access-Control-Allow-Headers": "Content-Type",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET",
-      },
+      headers: headers,
     };
   }
+};
+
+const headers = {
+  "Access-Control-Allow-Headers": "Content-Type",
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "POST",
 };

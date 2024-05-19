@@ -27,9 +27,14 @@ const transactionLine = (t: Transaction, i: number, myUserId: string) => {
       <div className="flex flex-row items-center gap-6">
         <div className="flex flex-col items-center justify-center">
           <span className="text-xs">
-            {monthNames[new Date(t.timestamp).getMonth() - 1].toUpperCase()}
+            {/* {monthNames[new Date(t.timestamp).getMonth()].toUpperCase()} */}
+            {new Date(t.timestamp)
+              .toLocaleString("default", {
+                month: "short",
+              })
+              .toUpperCase()}
           </span>
-          <span className="font-bold">{new Date(t.timestamp).getDay()}</span>
+          <span className="font-bold">{new Date(t.timestamp).getDate()}</span>
         </div>
         <div className="flex flex-col">
           <p className="text-sm font-medium">
@@ -41,8 +46,8 @@ const transactionLine = (t: Transaction, i: number, myUserId: string) => {
             )}
           </p>
           <div className="text-sm text-muted-foreground">
-            {t.status === "success" ? null : t.status === "failed" ||
-              t.status === "cancelled" ? (
+            {t.transactionStatus === "success" ? null : t.transactionStatus ===
+                "failed" || t.transactionStatus === "cancelled" ? (
               <Badge variant="destructive" className="text-xs">
                 Failed
               </Badge>
