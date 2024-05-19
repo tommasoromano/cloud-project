@@ -15,10 +15,10 @@ Amplify.configure(
     API: {
       REST: {
         "cloud-project-api-rest": {
-          endpoint: "https://z07r0dozg2.execute-api.eu-central-1.amazonaws.com/cloudprojectstage"
-        }
-      }
-    }
+          endpoint: String(process.env.NEXT_PUBLIC_REST_API_ENDPOINT),
+        },
+      },
+    },
   },
   { ssr: true }
 );

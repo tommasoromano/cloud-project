@@ -18,6 +18,7 @@ export default function useAuthUser() {
     async function getUser() {
       const session = await fetchAuthSession();
       if (!session.tokens) {
+        setUser([undefined, false]);
         return;
       }
       const user = {

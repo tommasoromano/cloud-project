@@ -38,7 +38,6 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <ConfigureAmplifyClientSide />
-          <Header />
           <div className="bg-secondary w-full h-full min-h-screen flex flex-col items-center justify-start">
             <div className="mt-14 w-full max-w-screen-sm p-6">{children}</div>
           </div>

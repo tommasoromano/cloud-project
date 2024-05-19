@@ -7,13 +7,18 @@ const dynamoDBClient = new DynamoDBClient();
 
 export const handler = async (event) => {
   let response;
-  let dataSQS;
+  const headers = {
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "POST",
+  };
 
   // check if body is empty
   if (!event.body) {
     response = {
       statusCode: 400,
       body: JSON.stringify({ message: "missing_information" }),
+      headers: headers,
     };
     return response;
   }
@@ -25,6 +30,7 @@ export const handler = async (event) => {
     response = {
       statusCode: 400,
       body: JSON.stringify({ message: "invalid_json" }),
+      headers: headers,
     };
     return response;
   }
@@ -36,6 +42,7 @@ export const handler = async (event) => {
       response = {
         statusCode: 400,
         body: JSON.stringify({ message: "missing_" + eventParams[i] }),
+        headers: headers,
       };
       return response;
     }
@@ -76,10 +83,11 @@ export const handler = async (event) => {
     return {
       statusCode: 500,
       body: JSON.stringify("Error adding record"),
+      headers: headers,
     };
   }
 
-  return {
+  response = {
     statusCode: 200,
     error: false,
     body: JSON.stringify({
@@ -92,63 +100,64 @@ export const handler = async (event) => {
       status,
       statusMessage,
     }),
-    headers: {
-      // "Access-Control-Allow-Headers": "Content-Type",
-      "Access-Control-Allow-Origin": "*",
-      // "Access-Control-Allow-Methods": "POST",
-    },
+    headers: headers,
   };
 
-  // dataSQS = JSON.parse(event.body)
-  // dataSQS.orderId = randomString
+  let dataSQS;
+  dataSQS = {
+    id: id,
+    sender: sender,
+    recipient: recipient,
+    amount: amount,
+    note: note,
+    timestamp: timestamp,
+    status: status,
+    statusMessage: statusMessage,
+  };
 
-  // const params = {
-  //     DelaySeconds: 0,
-  //     MessageAttributes: {
-  //         Author: {
-  //             DataType: "String",
-  //             StringValue: "Preeti",
-  //         }
-  //     },
-  //     MessageBody: JSON.stringify(dataSQS),
-  //     MessageGroupId: randomString,
-  //     FifoQueue: true,
-  //     MessageDeduplicationId: randomString,
-  //     MessageRetentionPeriod: 345600,
-  //     QueueUrl: "https://sqs.eu-central-1.amazonaws.com/495456954059/OrdersQueueFIFO.fifo"
-  // };
+  const params = {
+    DelaySeconds: 0,
+    MessageAttributes: {
+      Author: {
+        DataType: "String",
+        StringValue: "Preeti",
+      },
+    },
+    MessageBody: JSON.stringify(dataSQS),
+    MessageGroupId: id,
+    FifoQueue: true,
+    MessageDeduplicationId: id,
+    MessageRetentionPeriod: 345600,
+    QueueUrl:
+      "https://sqs.eu-central-1.amazonaws.com/986423401370/cloud-project.fifo",
+  };
 
-  // // Send the order to SQS
-  // try {
-  //     const data = await sqsClient.send(new SendMessageCommand(params));
-  //     if (data) {
-  //         console.log("Success, message sent. MessageID:", data.MessageId);
-  //         const bodyMessage = {
-  //             message: 'Message Send to SQS - MessageId: ' + data.MessageId,
-  //             orderId: randomString,
-  //             callbackUrl: "wss://wkr7p95088.execute-api.eu-central-1.amazonaws.com/production/"
-  //         }
-
-  //         response = {
-  //             headers: {
-  //                 "Access-Control-Allow-Headers": "Content-Type",
-  //                 "Access-Control-Allow-Origin": "*",
-  //                 "Access-Control-Allow-Methods": "POST"
-  //             },
-
-  //             statusCode: 200,
-  //             body: JSON.stringify(bodyMessage),
-  //         };
-  //     }
-  //     else {
-  //         response = {
-  //             statusCode: 500,
-  //             body: JSON.stringify({ "message": "error_sending_message_to_SQS" }),
-  //         };
-  //     }
-  //     return response;
-  // }
-  // catch (err) {
-  //     console.log("Error", err);
-  // }
+  // Send to SQS
+  try {
+    const data = await sqsClient.send(new SendMessageCommand(params));
+    console.log(data);
+    if (data) {
+      const bodyMessage = {
+        message: "Message Sent to SQS - MessageId: " + data.MessageId,
+        transaction: response.body,
+      };
+      return {
+        ...response,
+        body: JSON.stringify(bodyMessage),
+      };
+    } else {
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ message: "error_sending_message_to_SQS" }),
+        headers: headers,
+      };
+    }
+  } catch (err) {
+    console.log(err);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ message: "error: " + JSON.stringify(err) }),
+      headers: headers,
+    };
+  }
 };

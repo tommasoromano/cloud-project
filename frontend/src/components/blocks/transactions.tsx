@@ -18,7 +18,7 @@ const monthNames = [
   "Dec",
 ];
 
-const transactionLine = (t: Transaction, i: number) => {
+const transactionLine = (t: Transaction, i: number, myUserId: string) => {
   return (
     <div
       key={i}
@@ -33,8 +33,12 @@ const transactionLine = (t: Transaction, i: number) => {
         </div>
         <div className="flex flex-col">
           <p className="text-sm font-medium">
-            {t.amount >= 0 ? "Received from" : "Sent to"}{" "}
-            <span className="font-bold">{userToName(t.recipient)}</span>
+            {myUserId === t.recipient ? "Received from" : "Sent to"}{" "}
+            {myUserId === t.recipient ? (
+              <span className="font-bold">{userToName(t.sender)}</span>
+            ) : (
+              <span className="font-bold">{userToName(t.recipient)}</span>
+            )}
           </p>
           <div className="text-sm text-muted-foreground">
             {t.status === "success" ? null : t.status === "failed" ||
@@ -50,18 +54,16 @@ const transactionLine = (t: Transaction, i: number) => {
         </div>
       </div>
       <div className="flex items-center gap-2">
-        {t.amount >= 0 ? (
+        {myUserId === t.recipient ? (
           <p className="text-sm font-medium text-green-500">
-            +{t.amount.toFixed(2)}
-            {""}€
+            +{t.amount.toFixed(2)} €
           </p>
         ) : (
           <p className="text-sm font-medium text-red-500">
-            {t.amount.toFixed(2)}
-            {""}€
+            {t.amount.toFixed(2)} €
           </p>
         )}
-        {t.amount >= 0 ? (
+        {myUserId === t.recipient ? (
           <ArrowUpIcon className="h-4 w-4 text-green-500" />
         ) : (
           <ArrowDownIcon className="h-4 w-4 text-red-500" />
@@ -71,13 +73,18 @@ const transactionLine = (t: Transaction, i: number) => {
   );
 };
 
-export const Transactions = ({ data }: { data: Transaction[] }) => {
-
+export const Transactions = ({
+  data,
+  myUserId,
+}: {
+  data: Transaction[];
+  myUserId: string;
+}) => {
   return (
     <div className="rounded-lg bg-background p-6 shadow-sm w-full">
       <h2 className="text-lg font-medium">Recent Transactions</h2>
       <div className="mt-2 divide-y">
-        {data.map((t, i) => transactionLine(t, i))}
+        {data.map((t, i) => transactionLine(t, i, myUserId))}
       </div>
     </div>
   );
