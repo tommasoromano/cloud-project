@@ -5,14 +5,104 @@ import {
   UpdateItemCommand,
 } from "@aws-sdk/client-dynamodb";
 
+import {
+  CognitoIdentityProviderClient,
+  ListUsersCommand,
+} from "@aws-sdk/client-cognito-identity-provider";
+
 const client = new DynamoDBClient();
+const cognito = new CognitoIdentityProviderClient();
 
 export const handler = async (event) => {
   const transaction = JSON.parse(event["Records"][0]["body"]);
 
-  const sender = transaction["sender"];
-  const recipient = transaction["recipient"];
+  let sender = transaction["sender"];
+  let recipient = transaction["recipient"];
   const amount = transaction["amount"];
+
+  /*
+   * ---------------------
+   * Check if sender exists
+   * ---------------------
+   * */
+
+  // try {
+  //   sender = await emailToUserid(sender);
+  //   if (!sender) {
+  //     await updateTransaction(
+  //       transaction.id,
+  //       "failed",
+  //       "Sender does not exist"
+  //     );
+  //     return {
+  //       statusCode: 400,
+  //       body: JSON.stringify("Sender does not exist"),
+  //     };
+  //   }
+  // } catch (error) {
+  //   return {
+  //     statusCode: 500,
+  //     body: JSON.stringify("Error while checking sender existence"),
+  //   };
+  // }
+
+  /*
+   * ---------------------
+   * Check if recipient exists
+   * ---------------------
+   * */
+
+  try {
+    recipient = await emailToUserid(recipient);
+    if (!recipient) {
+      await updateTransaction(
+        transaction.id,
+        "failed",
+        "Recipient does not exist"
+      );
+      console.log("Recipient does not exist");
+      return {
+        statusCode: 400,
+        body: JSON.stringify("Recipient does not exist"),
+      };
+    }
+  } catch (error) {
+    return {
+      statusCode: 500,
+      body: JSON.stringify("Error while checking recipient existence"),
+    };
+  }
+
+  /*
+   * ---------------------
+   * Check if sender and recipient are the same
+   * ---------------------
+   * */
+
+  if (sender === recipient) {
+    try {
+      await updateTransaction(
+        transaction.id,
+        "failed",
+        "Sender and recipient are the same"
+      );
+      return {
+        statusCode: 400,
+        body: JSON.stringify("Sender and recipient are the same"),
+      };
+    } catch (error) {
+      return {
+        statusCode: 500,
+        body: JSON.stringify("Error updating transaction for same sender"),
+      };
+    }
+  }
+
+  /*
+   * ---------------------
+   * Check if balance is enough
+   * ---------------------
+   * */
 
   try {
     // Check if sender has enough balance
@@ -46,9 +136,18 @@ export const handler = async (event) => {
     };
   }
 
-  // update the transaction with same id on dynamo to status to success
+  /*
+   * ---------------------
+   * Update transaction status to success
+   * ---------------------
+   * */
+
   try {
-    await updateTransaction(transaction, "success", "Transaction successful");
+    await updateTransaction(
+      transaction.id,
+      "success",
+      "Transaction successful"
+    );
   } catch (error) {
     return {
       statusCode: 500,
@@ -61,6 +160,12 @@ export const handler = async (event) => {
     body: JSON.stringify("Transaction successful"),
   };
 };
+
+/*
+ * ---------------------
+ * Utility functions
+ * ---------------------
+ * */
 
 const updateTransaction = async (id, transactionStatus, statusMessage) => {
   const paramsDynamo = {
@@ -92,6 +197,7 @@ async function calculateBalance(userId) {
       },
     })
   );
+  console.log(data);
 
   if (!data.Items) {
     return 0;
@@ -99,6 +205,9 @@ async function calculateBalance(userId) {
 
   const balance = data.Items.reduce((acc, item) => {
     const amount = parseFloat(item.amount.N);
+    if (item.transactionStatus.S !== "success") {
+      return acc;
+    }
     if (item.recipient.S === userId) {
       return acc + amount;
     } else {
@@ -107,4 +216,16 @@ async function calculateBalance(userId) {
   }, 0);
 
   return balance;
+}
+
+async function emailToUserid(email) {
+  const paramsCognito = {
+    UserPoolId: "eu-central-1_8RUoTeJVb",
+    Filter: `email = "${email}"`,
+  };
+
+  const command = new ListUsersCommand(paramsCognito);
+  const users = await cognito.send(command);
+
+  return users.Users.length > 0 ? users.Users[0].Username : null;
 }

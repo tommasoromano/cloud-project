@@ -32,7 +32,7 @@ export default function Home() {
       )}
       {!loading && user && <HeroBalance transactions={transactions} />}
       {!loading && user && (
-        <Transactions data={transactions} myUserId={user.userId} />
+        <Transactions data={transactions} myUserId={user.email || ""} />
       )}
       {/* {sectionActions} */}
     </div>

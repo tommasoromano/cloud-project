@@ -1,4 +1,4 @@
-import { Transaction, nameToUser } from "@/types/types";
+import { Transaction } from "@/types/types";
 import { useState, useEffect, use } from "react";
 import useAuthUser, { User } from "./use-auth-user";
 import { get, post, isCancelError } from "@aws-amplify/api";
@@ -10,44 +10,22 @@ export default function useTransactions(user: User) {
 
   const fetchTransactions = () => {
     setLoading(true);
-    const fetchData = async () => {
-      const { body } = await get({
-        apiName: "cloud-project-api-rest",
-        path: "/transaction",
-      }).response;
-      return await body.json();
-    };
-    fetchData()
+    fetch(String(process.env.NEXT_PUBLIC_REST_API_ENDPOINT) + "/transaction")
+      .then((res) => res.json())
       .then((res) => {
-        const data = (JSON.parse((res as any)["body"]) as any[]).map(
-          (t) =>
-            ({
-              id: t.id,
-              sender: t.sender,
-              recipient: t.recipient,
-              timestamp: t.timestamp,
-              amount: t.amount,
-              transactionStatus: t.transactionStatus,
-              note: t.note,
-              statusMessage: t.statusMessage,
-            } as Transaction)
-        ) as Transaction[];
-        console.log(data);
+        const data = JSON.parse(res["body"] as string) as Transaction[];
         setTransactions(data);
         setLoading(false);
       })
       .catch((error) => {
-        if (!isCancelError(error)) {
-          console.error(error);
-          setLoading(false);
-        }
+        console.error(error);
       });
   };
 
   return {
     isLoading: loading,
     transactions: transactions
-      .filter((t) => t.sender === user?.userId || t.recipient === user?.userId)
+      .filter((t) => t.sender === user?.email || t.recipient === user?.email)
       .sort((a, b) => b.timestamp - a.timestamp),
     fetchTransactions: () => fetchTransactions(),
     postTransaction: async (
@@ -55,39 +33,18 @@ export default function useTransactions(user: User) {
       amount: number,
       note: string
     ) => {
-      // const randomString = Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 10);
-      const params: { [key: string]: string } = {
-        // id: randomString,
-        sender: user?.userId as string,
-        recipient: nameToUser(recipient),
-        amount: JSON.stringify(amount),
-        note: note,
-      };
-      // const formData = new FormData();
-      // Object.keys(params).forEach((key) => formData.append(key, params[key]));
-      // const { body } = await post({
-      //   apiName: "cloud-project-api-rest",
-      //   path: "/transaction",
-      //   options: {
-      //     body: formData,
-      //   },
-      // }).response;
-      // return await body.json();
-
       return await fetch(
         String(process.env.NEXT_PUBLIC_REST_API_ENDPOINT) + "/transaction",
-        { method: "POST", body: JSON.stringify(params) }
+        {
+          method: "POST",
+          body: JSON.stringify({
+            sender: user?.userId as string,
+            recipient: recipient,
+            amount: JSON.stringify(amount),
+            note: note,
+          }),
+        }
       );
-
-      // return await axios.post(
-      //   String(process.env.NEXT_PUBLIC_REST_API_ENDPOINT) + "/transaction",
-      //   {
-      //     sender: user?.userId,
-      //     recipient: nameToUser(recipient),
-      //     amount: JSON.stringify(amount),
-      //     note: note,
-      //   }
-      // );
     },
   };
 }
