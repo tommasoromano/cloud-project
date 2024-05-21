@@ -8,7 +8,7 @@ import {
   TransactionStatus,
   makeRandomTransaction,
 } from "@/types/types";
-import { CircleCheck, CircleX, Loader2 } from "lucide-react";
+import { CircleCheck, CircleX, Cog, Handshake, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { useFormState } from "react-dom";
@@ -30,11 +30,11 @@ export default function SendMoney() {
   async function handleSend(prevState: string | undefined, formData: FormData) {
     try {
       const _data = [
-        formData.get("recipient") as string,
+        formData.get("sender") as string,
         formData.get("amount") as string,
         formData.get("note") as string,
       ];
-      await postTransaction(_data[0], parseFloat(_data[1]), _data[2]);
+      await postTransaction(_data[0], parseFloat(_data[1]), _data[2], true);
       setData(_data);
       setSent(true);
     } catch (error) {
@@ -49,13 +49,13 @@ export default function SendMoney() {
     <div className="flex flex-col gap-6">
       <Header />
       <div className="rounded-lg bg-background p-6 shadow-sm">
-        <h2 className="text-lg font-medium">Send Money</h2>
+        <h2 className="text-lg font-medium">Request Money</h2>
         <form action={dispatch} className="mt-4 space-y-4">
           <div className="space-y-1">
-            <Label htmlFor="recipient">Recipient</Label>
+            <Label htmlFor="sender">Sender</Label>
             <Input
-              id="recipient"
-              name="recipient"
+              id="sender"
+              name="sender"
               placeholder="Enter a friend's name"
             />
           </div>
@@ -73,7 +73,7 @@ export default function SendMoney() {
             <Textarea id="note" name="note" placeholder="Add a note" />
           </div>
           <Button className="w-full" type="submit" onClick={() => {}}>
-            Send Money
+            Request Money
           </Button>
           <div className="mt-4 text-red-500">{errorMessage}</div>
         </form>
@@ -83,10 +83,14 @@ export default function SendMoney() {
 
   const success = data && (
     <div className="rounded-lg bg-background p-6 shadow-sm flex flex-col items-center justify-center gap-4">
-      <CircleCheck className="h-16 w-16 text-green-500" />
-      <h2 className="text-lg font-medium">Sent correctly!</h2>
-      <p className="">
-        You sent {parseFloat(data[1]).toFixed(2)}€ to {data[0]} for: {data[2]}
+      {/* <Handshake className="h-16 w-16 text-foreground" /> */}
+      <Cog className="h-16 w-16 text-foreground animate-spin" />
+      <h2 className="text-lg font-medium">Requested correctly!</h2>
+      <p className="text-center">
+        You requested {parseFloat(data[1]).toFixed(2)}€ from {data[0]} for:{" "}
+        {data[2]}.
+        <br />
+        The transaction is currently pending. It will be processed shortly.
       </p>
       <div className="flex gap-2">
         <Link href="/">
@@ -99,7 +103,7 @@ export default function SendMoney() {
             Back to Home
           </Button>
         </Link>
-        <Link href="/send">
+        <Link href="/request">
           <Button
             className="w-full"
             onClick={() => {
@@ -107,7 +111,7 @@ export default function SendMoney() {
               setData(undefined);
             }}
           >
-            Send More Money
+            Request More Money
           </Button>
         </Link>
       </div>

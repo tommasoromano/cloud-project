@@ -26,25 +26,25 @@ export const handler = async (event) => {
    * ---------------------
    * */
 
-  // try {
-  //   sender = await emailToUserid(sender);
-  //   if (!sender) {
-  //     await updateTransaction(
-  //       transaction.id,
-  //       "failed",
-  //       "Sender does not exist"
-  //     );
-  //     return {
-  //       statusCode: 400,
-  //       body: JSON.stringify("Sender does not exist"),
-  //     };
-  //   }
-  // } catch (error) {
-  //   return {
-  //     statusCode: 500,
-  //     body: JSON.stringify("Error while checking sender existence"),
-  //   };
-  // }
+  try {
+    sender = await emailToUserid(sender);
+    if (!sender) {
+      await updateTransaction(
+        transaction.id,
+        "failed",
+        "Sender does not exist"
+      );
+      return {
+        statusCode: 400,
+        body: JSON.stringify("Sender does not exist"),
+      };
+    }
+  } catch (error) {
+    return {
+      statusCode: 500,
+      body: JSON.stringify("Error while checking sender existence"),
+    };
+  }
 
   /*
    * ---------------------

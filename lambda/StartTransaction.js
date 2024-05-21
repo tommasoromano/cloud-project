@@ -6,36 +6,38 @@ import { DynamoDBClient, PutItemCommand } from "@aws-sdk/client-dynamodb"; // ES
 const dynamoDBClient = new DynamoDBClient();
 
 export const handler = async (event) => {
-  // check if body is empty
-  if (!event.body) {
-    return returnErrorParams("Missing body");
-  }
+  let [sender, recipient, amount, note, transactionStatus] = [
+    "",
+    "",
+    "",
+    "",
+    "",
+  ];
 
-  // check if body is valid JSON
   try {
-    JSON.parse(event.body);
+    const eventParams = [
+      "sender",
+      "recipient",
+      "amount",
+      "note",
+      "transactionStatus",
+    ];
+    [sender, recipient, amount, note, transactionStatus] = eventParams.map(
+      (param) => JSON.parse(event.body)[param]
+    );
   } catch (error) {
-    return returnErrorParams("Invalid json");
+    return returnErrorParams("Invalid body or json");
   }
 
-  // check if body contains all required parameters
-  const eventParams = ["sender", "recipient", "amount", "note"];
-  for (let i = 0; i < eventParams.length; i++) {
-    if (!JSON.parse(event.body)[eventParams[i]]) {
-      return returnErrorParams("Missing " + eventParams[i]);
-    }
-  }
-
-  const [sender, recipient, amount, note] = eventParams.map(
-    (param) => JSON.parse(event.body)[param]
-  );
   const id =
     Math.random().toString(36).substring(2, 10) +
     Math.random().toString(36).substring(2, 10) +
     Math.random().toString(36).substring(2, 10);
   const timestamp = Date.now();
-  const transactionStatus = "pending";
-  const statusMessage = "Transaction is pending";
+  const statusMessage =
+    transactionStatus === "pending"
+      ? "Transaction is pending"
+      : "Waiting sender approval";
 
   const paramsDynamo = {
     TableName: "transactions",
@@ -69,6 +71,18 @@ export const handler = async (event) => {
     transactionStatus: transactionStatus,
     statusMessage: statusMessage,
   };
+
+  if (transactionStatus === "requested") {
+    return {
+      statusCode: 200,
+      error: false,
+      body: JSON.stringify({
+        message: "Transaction requested",
+        transaction: dataSQS,
+      }),
+      headers: headers,
+    };
+  }
 
   const params = {
     DelaySeconds: 0,

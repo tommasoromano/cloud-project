@@ -8,7 +8,7 @@ import {
   TransactionStatus,
   makeRandomTransaction,
 } from "@/types/types";
-import { CircleCheck, CircleX, Loader2 } from "lucide-react";
+import { CircleCheck, CircleX, Cog, Handshake, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { useFormState } from "react-dom";
@@ -83,10 +83,13 @@ export default function SendMoney() {
 
   const success = data && (
     <div className="rounded-lg bg-background p-6 shadow-sm flex flex-col items-center justify-center gap-4">
-      <CircleCheck className="h-16 w-16 text-green-500" />
+      {/* <Handshake className="h-16 w-16 text-foreground" /> */}
+      <Cog className="h-16 w-16 text-foreground animate-spin" />
       <h2 className="text-lg font-medium">Sent correctly!</h2>
-      <p className="">
-        You sent {parseFloat(data[1]).toFixed(2)}€ to {data[0]} for: {data[2]}
+      <p className="text-center">
+        You sent {parseFloat(data[1]).toFixed(2)}€ to {data[0]} for: {data[2]}.
+        <br />
+        The transaction is currently pending. It will be processed shortly.
       </p>
       <div className="flex gap-2">
         <Link href="/">

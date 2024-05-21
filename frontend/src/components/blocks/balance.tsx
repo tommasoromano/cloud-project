@@ -20,7 +20,7 @@ export const HeroBalance = ({
         <div>
           <h2 className="text-lg font-medium">
             Hello{" "}
-            <span className="font-black">{user?.email?.split("@")[0]}</span>
+            <span className="font-bold">{user?.email?.split("@")[0]}</span>
             {/* <span className="font-black">{user.email}</span> ☀️ */}
           </h2>
           {/* <p className="text-3xl font-bold">$2,546.78</p> */}
@@ -34,9 +34,11 @@ export const HeroBalance = ({
               Send
             </Button>
           </Link>
-          <Button size="sm" variant="outline" className="text-primary">
-            Request
-          </Button>
+          <Link href="/request">
+            <Button size="sm" variant="outline" className="text-primary">
+              Request
+            </Button>
+          </Link>
         </div>
       </div>
     </div>

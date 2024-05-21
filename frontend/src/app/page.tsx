@@ -11,7 +11,10 @@ import { Header } from "@/components/blocks/header";
 
 export default function Home() {
   const [user, isLoadingAuth] = useAuthUser();
-  const { isLoading, transactions, fetchTransactions } = useTransactions(user);
+  const { isLoading, transactions, fetchTransactions, postRequest } =
+    useTransactions(user);
+
+  const [approvals, setApprovals] = useState<string[]>([]);
 
   useEffect(() => {
     fetchTransactions();

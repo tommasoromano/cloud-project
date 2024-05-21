@@ -31,17 +31,31 @@ export default function useTransactions(user: User) {
     postTransaction: async (
       recipient: string,
       amount: number,
-      note: string
+      note: string,
+      request: boolean = false
     ) => {
       return await fetch(
         String(process.env.NEXT_PUBLIC_REST_API_ENDPOINT) + "/transaction",
         {
           method: "POST",
           body: JSON.stringify({
-            sender: user?.userId as string,
-            recipient: recipient,
+            sender: request ? recipient : (user?.email as string),
+            recipient: request ? (user?.email as string) : recipient,
             amount: JSON.stringify(amount),
             note: note,
+            transactionStatus: request ? "requested" : "pending",
+          }),
+        }
+      );
+    },
+    postRequest: async (transactionId: string, approval: boolean) => {
+      return await fetch(
+        String(process.env.NEXT_PUBLIC_REST_API_ENDPOINT) + "/request",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            id: transactionId,
+            approval: approval,
           }),
         }
       );

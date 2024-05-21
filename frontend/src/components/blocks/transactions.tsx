@@ -1,24 +1,33 @@
-import { ArrowDownIcon, ArrowUpIcon } from "lucide-react";
+import { ArrowDownIcon, ArrowUpIcon, Cog } from "lucide-react";
 import { Badge } from "../ui/badge";
 import { Transaction } from "@/types/types";
 import { useEffect, useState } from "react";
+import { Button } from "../ui/button";
+import useTransactions from "@/app/hooks/use-transactions";
 
-const transactionLine = (
-  t: Transaction,
-  i: number,
-  myUserId: string,
-  selected: string,
-  onClick: (id: string) => void
-) => {
+const transactionLine = (t: Transaction, i: number, myUserId: string) => {
+  const { postRequest } = useTransactions(undefined);
+  const [processingRequest, setProcessingRequest] = useState(false);
+
+  const onClickRequest = (id: string, approval: boolean) => {
+    setProcessingRequest(true);
+    postRequest(id, approval)
+      .then((res) => res.json())
+      .then((res) => {
+        console.log(res);
+        setProcessingRequest(true);
+      })
+      .catch((error) => {
+        setProcessingRequest(false);
+        console.error(error);
+      });
+  };
   return (
     <div
       key={i}
       className="w-full flex flex-col gap-2 justify-center items-center"
     >
-      <div
-        className="w-full flex flex-row justify-between items-center py-3"
-        onClick={() => onClick(selected === t.id ? "" : t.id)}
-      >
+      <div className="w-full flex flex-row justify-between items-center py-3">
         <div className="flex flex-row items-center gap-6">
           <div className="flex flex-col items-center justify-center">
             <span className="text-xs">
@@ -90,9 +99,34 @@ const transactionLine = (
           )}
         </div>
       </div>
-      {selected === t.id && (
-        <div className="text-sm mb-2">Status: {t.statusMessage}</div>
-      )}
+      {t.transactionStatus !== "success" ? (
+        t.transactionStatus === "requested" && t.sender === myUserId ? (
+          processingRequest ? (
+            <div className="flex items-center justify-center gap-2 pb-4">
+              <Cog className="h-6 w-6 animate-spin" />
+              Processing request...
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center gap-2 pb-4">
+              <div>Approve this transaction request</div>
+              <div className="flex gap-2 justify-center items-center">
+                <Button onClick={() => onClickRequest(t.id, true)} className="">
+                  Accept
+                </Button>
+                <Button
+                  onClick={() => onClickRequest(t.id, false)}
+                  variant="destructive"
+                  className=""
+                >
+                  Decline
+                </Button>
+              </div>
+            </div>
+          )
+        ) : (
+          <div className="text-sm mb-2">{t.statusMessage}</div>
+        )
+      ) : null}
     </div>
   );
 };
@@ -104,14 +138,11 @@ export const Transactions = ({
   data: Transaction[];
   myUserId: string;
 }) => {
-  const [selected, setSelected] = useState<string>("");
   return (
     <div className="rounded-lg bg-background p-6 shadow-sm w-full">
       <h2 className="text-lg font-medium">Recent Transactions</h2>
       <div className="mt-2 divide-y">
-        {data.map((t, i) =>
-          transactionLine(t, i, myUserId, selected, (id) => setSelected(id))
-        )}
+        {data.map((t, i) => transactionLine(t, i, myUserId))}
       </div>
     </div>
   );
