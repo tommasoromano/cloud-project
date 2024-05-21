@@ -59,11 +59,6 @@ export async function handleConfirmSignUp(
   prevState: string | undefined,
   formData: FormData
 ) {
-  console.log(
-    "handleConfirmSignUp",
-    formData.get("email"),
-    formData.get("code")
-  );
   try {
     const { isSignUpComplete, nextStep } = await confirmSignUp({
       username: String(formData.get("email")),
@@ -73,7 +68,7 @@ export async function handleConfirmSignUp(
   } catch (error) {
     return getErrorMessage(error);
   }
-  redirect("/auth/login");
+  redirect("/");
 }
 
 export async function handleSignIn(

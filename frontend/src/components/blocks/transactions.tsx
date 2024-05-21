@@ -48,22 +48,38 @@ const transactionLine = (
           </div>
         </div>
         <div className="flex flex-col gap-2 items-end justify-center">
-          <div className="flex items-center gap-2">
-            {myUserId === t.recipient ? (
-              <p className="text-sm font-medium text-green-500">
-                +{t.amount.toFixed(2)} €
-              </p>
-            ) : (
-              <p className="text-sm font-medium text-red-500">
-                -{t.amount.toFixed(2)} €
-              </p>
-            )}
-            {myUserId === t.recipient ? (
-              <ArrowUpIcon className="h-4 w-4 text-green-500" />
-            ) : (
-              <ArrowDownIcon className="h-4 w-4 text-red-500" />
-            )}
-          </div>
+          {t.transactionStatus === "success" && (
+            <div className="flex items-center gap-2">
+              {myUserId === t.recipient ? (
+                <p className="text-sm font-medium text-green-500">
+                  +{t.amount.toFixed(2)} €
+                </p>
+              ) : (
+                <p className="text-sm font-medium text-red-500">
+                  -{t.amount.toFixed(2)} €
+                </p>
+              )}
+              {myUserId === t.recipient ? (
+                <ArrowUpIcon className="h-4 w-4 text-green-500" />
+              ) : (
+                <ArrowDownIcon className="h-4 w-4 text-red-500" />
+              )}
+            </div>
+          )}
+          {t.transactionStatus !== "success" && (
+            <div className="flex items-center gap-2 text-muted-foreground">
+              {myUserId === t.recipient ? (
+                <p className="text-sm font-medium">+{t.amount.toFixed(2)} €</p>
+              ) : (
+                <p className="text-sm font-medium">-{t.amount.toFixed(2)} €</p>
+              )}
+              {myUserId === t.recipient ? (
+                <ArrowUpIcon className="h-4 w-4" />
+              ) : (
+                <ArrowDownIcon className="h-4 w-4" />
+              )}
+            </div>
+          )}
           {t.transactionStatus === "success" ? null : t.transactionStatus ===
               "failed" || t.transactionStatus === "cancelled" ? (
             <Badge variant="destructive" className="text-xs">

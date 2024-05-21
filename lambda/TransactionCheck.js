@@ -66,6 +66,7 @@ export const handler = async (event) => {
         body: JSON.stringify("Recipient does not exist"),
       };
     }
+    await updateRecipient(transaction.id, recipient);
   } catch (error) {
     return {
       statusCode: 500,
@@ -167,6 +168,23 @@ export const handler = async (event) => {
  * ---------------------
  * */
 
+const updateRecipient = async (id, recipient) => {
+  const paramsDynamo = {
+    TableName: "transactions",
+    Key: {
+      id: { S: id },
+    },
+    UpdateExpression: "SET recipient = :recipient",
+    ExpressionAttributeValues: {
+      ":recipient": { S: recipient },
+    },
+  };
+
+  const command = new UpdateItemCommand(paramsDynamo);
+
+  return client.send(command);
+};
+
 const updateTransaction = async (id, transactionStatus, statusMessage) => {
   const paramsDynamo = {
     TableName: "transactions",
@@ -197,7 +215,6 @@ async function calculateBalance(userId) {
       },
     })
   );
-  console.log(data);
 
   if (!data.Items) {
     return 0;

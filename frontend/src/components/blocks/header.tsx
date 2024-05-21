@@ -81,29 +81,25 @@ export const Header = ({}: {}) => {
           ) : user ? (
             hasUser
           ) : (
-            <Button
-              onClick={() => router.push("/auth/login")}
-              variant={"secondary"}
-            >
-              Login
-            </Button>
+            <div className="flex flex-row gap-2">
+              <Button
+                onClick={() => router.push("/auth/login")}
+                variant={"secondary"}
+              >
+                Login
+              </Button>
+
+              <Button
+                onClick={() => router.push("/auth/signup")}
+                variant={"outline"}
+              >
+                Signup
+              </Button>
+            </div>
           )}
         </div>
       </div>
       {/* <LoginBlocker /> */}
     </header>
-  );
-};
-
-const LoginBlocker = ({}: {}) => {
-  const [kind, setKind] = useState("login");
-
-  return (
-    <AlertDialog open>
-      {/* <AlertDialogTrigger>Open</AlertDialogTrigger> */}
-      <AlertDialogContent className="bg-transparent border-transparent">
-        {kind === "login" ? <LoginForm /> : <SignupForm />}
-      </AlertDialogContent>
-    </AlertDialog>
   );
 };
