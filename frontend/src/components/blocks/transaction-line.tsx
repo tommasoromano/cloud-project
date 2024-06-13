@@ -51,9 +51,9 @@ export const TransactionLine = ({
                 ? "Received from"
                 : "Sent to"}{" "}
               {t.sender === t.recipient ? null : myUserId === t.recipient ? (
-                <span className="font-bold">{t.sender.split("@")[0]}</span>
+                <span className="font-bold">{t.sender}</span>
               ) : (
-                <span className="font-bold">{t.recipient.split("@")[0]}</span>
+                <span className="font-bold">{t.recipient}</span>
               )}
             </div>
             <div className="text-sm text-muted-foreground">{t.note}</div>
