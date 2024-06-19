@@ -17,8 +17,8 @@ export default function Home() {
   const [approvals, setApprovals] = useState<string[]>([]);
 
   useEffect(() => {
-    fetchTransactions();
-  }, []);
+    fetchTransactions(user);
+  }, [user]);
 
   const loading = isLoadingAuth || isLoading;
 

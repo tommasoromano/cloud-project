@@ -8,7 +8,7 @@ export default function useTransactions(user: User) {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const fetchTransactions = () => {
+  const fetchTransactions = (user: User) => {
     setLoading(true);
     fetch(
       String(process.env.NEXT_PUBLIC_REST_API_ENDPOINT) +
@@ -31,7 +31,7 @@ export default function useTransactions(user: User) {
     transactions: transactions
       .filter((t) => t.sender === user?.email || t.recipient === user?.email)
       .sort((a, b) => b.timestamp - a.timestamp),
-    fetchTransactions: () => fetchTransactions(),
+    fetchTransactions: (user: User) => fetchTransactions(user),
     postTransaction: async (
       recipient: string,
       amount: number,
