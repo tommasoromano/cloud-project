@@ -10,7 +10,11 @@ export default function useTransactions(user: User) {
 
   const fetchTransactions = () => {
     setLoading(true);
-    fetch(String(process.env.NEXT_PUBLIC_REST_API_ENDPOINT) + "/transaction")
+    fetch(
+      String(process.env.NEXT_PUBLIC_REST_API_ENDPOINT) +
+        "/transactions?userId=" +
+        user?.userId
+    )
       .then((res) => res.json())
       .then((res) => {
         const data = JSON.parse(res["body"] as string) as Transaction[];

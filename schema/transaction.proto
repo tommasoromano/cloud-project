@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+message Transaction {
+  string id = 1;
+  string sender = 2;
+  string recipient = 3;
+  double timestamp = 4;
+    double amount = 5;
+    TransactionStatus transactionStatus = 6;
+    enum TransactionStatus {
+        pending = 0;
+        success = 1;
+        failed = 2;
+        cancelled = 3;
+        requested = 4;
+    }
+    string note = 7;
+    string statusMessage = 8;
+}
