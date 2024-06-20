@@ -105,9 +105,9 @@ module.exports.handler = async (event, context, callback) => {
         : item.recipient;
     });
 
-    return respond.success(items);
+    return respond.success(JSON.stringify(items));
   } catch (error) {
-    return respond.error(error.message);
+    return respond.error(JSON.stringify(error.message));
   }
 };
 
@@ -115,7 +115,7 @@ const respond = {
   success: (data) => {
     return {
       statusCode: 200,
-      body: JSON.stringify(data),
+      body: data,
       headers: headers,
       isBase64Encoded: false,
     };
@@ -123,7 +123,7 @@ const respond = {
   error: (message) => {
     return {
       statusCode: 500,
-      body: JSON.stringify(message),
+      body: message,
       headers: headers,
       isBase64Encoded: false,
     };
@@ -131,7 +131,7 @@ const respond = {
   notFound: (message) => {
     return {
       statusCode: 404,
-      body: JSON.stringify(message),
+      body: message,
       headers: headers,
       isBase64Encoded: false,
     };

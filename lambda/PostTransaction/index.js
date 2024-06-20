@@ -78,10 +78,12 @@ export const handler = async (event) => {
   };
 
   if (transactionStatus === "requested") {
-    return respond.success({
-      message: "Transaction requested",
-      transaction: dataSQS,
-    });
+    return respond.success(
+      JSON.stringify({
+        message: "Transaction requested",
+        transaction: dataSQS,
+      })
+    );
   }
 
   const params = {
@@ -105,10 +107,12 @@ export const handler = async (event) => {
   try {
     const data = await sqsClient.send(new SendMessageCommand(params));
     if (data) {
-      return respond.success({
-        message: "Message Sent to SQS - MessageId: " + data.MessageId,
-        transaction: dataSQS,
-      });
+      return respond.success(
+        JSON.stringify({
+          message: "Message Sent to SQS - MessageId: " + data.MessageId,
+          transaction: dataSQS,
+        })
+      );
     } else {
       return respond.error("Error sending message to SQS");
     }
@@ -121,7 +125,7 @@ const respond = {
   success: (data) => {
     return {
       statusCode: 200,
-      body: JSON.stringify(data),
+      body: data,
       headers: headers,
       isBase64Encoded: false,
     };
@@ -129,7 +133,7 @@ const respond = {
   error: (message) => {
     return {
       statusCode: 500,
-      body: JSON.stringify(message),
+      body: message,
       headers: headers,
       isBase64Encoded: false,
     };
@@ -137,7 +141,7 @@ const respond = {
   notFound: (message) => {
     return {
       statusCode: 404,
-      body: JSON.stringify(message),
+      body: message,
       headers: headers,
       isBase64Encoded: false,
     };
