@@ -1,6 +1,9 @@
 import { ArrowDownIcon, ArrowUpIcon, Cog } from "lucide-react";
 import { Badge } from "../ui/badge";
-import { Transaction } from "@/types/types";
+import {
+  Transaction,
+  Transaction_TransactionStatus,
+} from "@/generated/transaction";
 import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import useTransactions from "@/app/hooks/use-transactions";
@@ -60,7 +63,7 @@ export const TransactionLine = ({
           </div>
         </div>
         <div className="flex flex-col gap-2 items-end justify-center">
-          {t.transactionStatus === "success" && (
+          {t.transactionStatus === Transaction_TransactionStatus.success && (
             <div className="flex items-center gap-2">
               {myUserId === t.recipient ? (
                 <p className="text-sm font-medium text-green-500">
@@ -78,7 +81,7 @@ export const TransactionLine = ({
               )}
             </div>
           )}
-          {t.transactionStatus !== "success" && (
+          {t.transactionStatus !== Transaction_TransactionStatus.success && (
             <div className="flex items-center gap-2 text-muted-foreground">
               {myUserId === t.recipient ? (
                 <p className="text-sm font-medium">+{t.amount.toFixed(2)} €</p>
@@ -92,8 +95,10 @@ export const TransactionLine = ({
               )}
             </div>
           )}
-          {t.transactionStatus === "success" ? null : t.transactionStatus ===
-              "failed" || t.transactionStatus === "cancelled" ? (
+          {t.transactionStatus ===
+          Transaction_TransactionStatus.success ? null : t.transactionStatus ===
+              Transaction_TransactionStatus.failed ||
+            t.transactionStatus === Transaction_TransactionStatus.cancelled ? (
             <Badge variant="destructive" className="text-xs">
               Failed
             </Badge>
@@ -102,8 +107,9 @@ export const TransactionLine = ({
           )}
         </div>
       </div>
-      {t.transactionStatus !== "success" ? (
-        t.transactionStatus === "requested" && t.sender === myUserId ? (
+      {t.transactionStatus !== Transaction_TransactionStatus.success ? (
+        t.transactionStatus === Transaction_TransactionStatus.requested &&
+        t.sender === myUserId ? (
           processingRequest ? (
             <div className="flex items-center justify-center gap-2 pb-4">
               <Cog className="h-6 w-6 animate-spin" />

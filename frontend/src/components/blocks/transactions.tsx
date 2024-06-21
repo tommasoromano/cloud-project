@@ -1,10 +1,10 @@
 import { ArrowDownIcon, ArrowUpIcon, Cog } from "lucide-react";
 import { Badge } from "../ui/badge";
-import { Transaction } from "@/types/types";
 import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import useTransactions from "@/app/hooks/use-transactions";
 import { TransactionLine } from "./transaction-line";
+import { Transaction } from "@/generated/transaction";
 
 export const Transactions = ({
   data,

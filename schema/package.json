@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@protobuf-ts/plugin": "^2.9.4",
     "ts-proto": "^1.180.0"
   }
 }

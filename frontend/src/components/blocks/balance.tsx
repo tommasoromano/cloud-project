@@ -1,4 +1,5 @@
-import { Transaction, calculateBalance } from "@/types/types";
+import { Transaction } from "@/types/types";
+import { calculateBalance } from "@/lib/utils";
 import { Button } from "../ui/button";
 import Link from "next/link";
 import useAuthUser from "@/app/hooks/use-auth-user";

@@ -1,4 +1,4 @@
-import { Transaction } from "@/types/types";
+import { Transaction } from "@/generated/transaction";
 import { useState, useEffect, use } from "react";
 import useAuthUser, { User } from "./use-auth-user";
 import { get, post, isCancelError } from "@aws-amplify/api";

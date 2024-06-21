@@ -21,3 +21,9 @@ docker tag get-transactions-image:test 986423401370.dkr.ecr.eu-central-1.amazona
 
 docker push 986423401370.dkr.ecr.eu-central-1.amazonaws.com/cloud-project:get-transactions-latest
 ```
+
+```
+sam init
+sam build
+sam deploy –guided
+```

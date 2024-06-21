@@ -1,6 +1,5 @@
 "use client";
 import { Transactions } from "@/components/blocks/transactions";
-import { Transaction, makeRandomTransaction } from "@/types/types";
 import { HeroBalance } from "@/components/blocks/balance";
 import { CircleX, Loader2 } from "lucide-react";
 import useAuthUser from "./hooks/use-auth-user";
