@@ -3,5 +3,8 @@
     "@aws-sdk/client-cognito-identity-provider": "^3.600.0",
     "@aws-sdk/client-dynamodb": "^3.600.0",
     "aws-sdk": "^2.1644.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.8"
   }
 }
